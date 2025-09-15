@@ -6,4 +6,4 @@ sitemap
 - new password available for 3 days, as of 9/12/2025 DDMMYYYY
 
 ## PATCH 1.2-- Minor GUI overhaul
-- Looks better then before, definetly still needs work
+- Looks better then before. However, It definetly still needs work.
