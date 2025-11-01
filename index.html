@@ -1,66 +1,67 @@
 <!DOCTYPE html>
-<title>gooblet</title>
 <html>
-<script>
-window.addEventListener('DOMContentLoaded', (event) => {
-      const x = 0;
-      if (x === 2) {
-        window.location.href = "./maintenance/horse.html"; 
+  <head>
+    <meta charset="UTF-8">
+    <title>gooblet</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        margin-top: 60px;
       }
-    });
-h1 {
-      font-weight: bold;
-      margin-top: 20px;
-      text-align: center;
-    }
-</script>
-<h1>Today's Password: "maintenancefriday"</h1><br>
-  <h1>PASSWORD PROTECTED PAGE</h1><br>
-<body>changes every friday. Consult me in person or thru text to get new password. btw 2nd password is "pie" (YES, I MADE THIS, EL maade this.)</body><br>
-<form>
-  <input name="pass" id="pass" type="password" placeholder="secret password" required>
-  <input name="pass" id="pass2" type="password" placeholder="verification password" required>
-  <input type="button" value="Submit" onclick="myFunction(); myFunction2();">
-</form> 
+      input {
+        margin: 8px;
+        padding: 10px;
+        font-size: 1rem;
+      }
+      button {
+        padding: 10px 15px;
+        font-size: 1rem;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Password Protected Page</h1>
+    <p>Enter both passwords to continue:</p>
 
+    <input id="pass1" type="password" placeholder="Main password" required><br>
+    <input id="pass2" type="password" placeholder="Verification password" required><br>
+    <button onclick="checkPasswords()">Submit</button>
 
-<script>
-function myFunction() {
-  const encodedPasswords = ["MjM0MTQy123MzQ=", "R01T123MjAyNQ==", "bGltYnVzY29tcGFueQ==", "bWFpbnRlbmFuY2VmcmlkYXk="];
+    <script>
+      // Hash of "maintenancefriday"
+      const HASH_PASS1 = "5b53b3b2e28c7492e65757e91f83d2d2344f642c2b80323e7083f39ff4a7a9b1";
+      // Hash of "pie"
+      const HASH_PASS2 = "63e0f4ef67c7c04b9af50b1456b2f2ee22df7d21a2d2fc95c33706ffb9e6b83d";
 
-  const userInput = document.getElementById("pass").value;
+      async function hashText(text) {
+        const data = new TextEncoder().encode(text);
+        const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+      }
 
-  if (userInput.trim() === "") {
-    alert("Please enter a password.");
-    return;
-  }
+      async function checkPasswords() {
+        const pass1 = document.getElementById("pass1").value.trim();
+        const pass2 = document.getElementById("pass2").value.trim();
 
-  const encodedInput = btoa(userInput);
+        if (!pass1 || !pass2) {
+          alert("Please fill in both passwords.");
+          return;
+        }
 
-  if (encodedPasswords.includes(encodedInput)) {
-    sessionStorage.setItem('password', encodedInput);
-  } else {
-    alert("Password is incorrect.");
-  }
-}
-function myFunction2() {
-  const encodedPasswords = ["cGll", "Y3Vt"];
+        const hashed1 = await hashText(pass1);
+        const hashed2 = await hashText(pass2);
 
-  const userInput = document.getElementById("pass2").value;
-
-  if (userInput.trim() === "") {
-    alert("Please enter the second password.");
-    return;
-  }
-
-  const encodedInput = btoa(userInput);
-
-  if (encodedPasswords.includes(encodedInput)) {
-    sessionStorage.setItem('password2', encodedInput);
-    window.location.href = "main.html";
-  } else {
-    alert("Password is incorrect.");
-  }
-}
-</script>
+        if (hashed1 === HASH_PASS1 && hashed2 === HASH_PASS2) {
+          sessionStorage.setItem("auth1", hashed1);
+          sessionStorage.setItem("auth2", hashed2);
+          window.location.href = "main.html";
+        } else {
+          alert("Incorrect password(s).");
+        }
+      }
+    </script>
+  </body>
 </html>
